@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#050b16" />
+<meta name="description" content="다양한 조건을 설정해 로또 번호 조합을 생성하고 조합 통계를 분석하세요." />
+<title>정태민이 예지하는 로또 번호 — 구간·끝자리·연속번호 필터</title>
+<style>
+
+:root{color-scheme:dark;--bg:#050b16;--card:#0a1424;--ink:#edf4ff;--muted:#91a4bf;--line:#1c304a;--blue:#238cff;--blue2:#102a48;--green:#35c994;--greenbg:#102c29;--amber:#f0bf59;--amberbg:#302510;--gold:#e8b85b}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% -15%,rgba(26,86,150,.28),transparent 48%),linear-gradient(180deg,#050b16,#07101e 55%,#050b16);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1240px;margin:0 auto;padding:28px 22px 52px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(115deg,rgba(12,30,53,.98),rgba(8,21,39,.94) 55%,rgba(18,38,65,.92));border:1px solid #254263;color:#f5f8ff;padding:34px;border-radius:22px;margin-bottom:20px;box-shadow:0 20px 60px #0004,inset 0 1px #ffffff0a}
+.hero:after{content:"";position:absolute;width:310px;height:310px;right:-90px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(44,140,255,.2),transparent 70%);pointer-events:none}
+.hero h1{font-size:clamp(30px,4vw,44px);line-height:1.12;letter-spacing:-.04em;margin:0 0 12px;font-weight:800}.hero h1:before{content:"LOTTO GEN  /  ";display:block;font-size:11px;letter-spacing:.22em;color:var(--gold);margin-bottom:13px;font-weight:800}.hero p{margin:0;opacity:.9;max-width:780px;color:#c4d3e7;font-size:15px}
+.card{background:linear-gradient(145deg,rgba(12,25,43,.97),rgba(7,17,31,.98));border:1px solid var(--line);border-radius:18px;padding:23px;margin-bottom:18px;box-shadow:0 12px 36px #0002,inset 0 1px #ffffff06}
+h2{font-size:19px;letter-spacing:-.02em;margin:0 0 13px;display:flex;align-items:center;gap:10px}h2:before{content:"";display:inline-block;width:3px;height:20px;border-radius:4px;background:linear-gradient(var(--gold),#7b9dff)}h3{font-size:16px;margin:0 0 6px}.sub{color:var(--muted);font-size:14px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}.filter{background:#0d1d31a0;border:1px solid #203651;border-radius:14px;padding:15px;display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;transition:border-color .18s,transform .18s}.filter:hover{border-color:#37618b;transform:translateY(-1px)}.filter input[type=checkbox]{width:17px;height:17px;margin:4px 0;accent-color:var(--blue)}.filter label{font-weight:700;cursor:pointer;color:#e4edfa}.desc{font-size:13px;color:#8fa3bf;margin-top:4px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:#9bb0ca;font-weight:700}.field input,.field select{border:1px solid #2a4260;border-radius:10px;background:#081426;color:#eaf2ff;padding:10px 11px;font:inherit;min-width:100px;outline:none}.field input:focus,.field select:focus{border-color:#3a9bff;box-shadow:0 0 0 3px #238cff22}.field input[type=number]{width:100px}
+.field button,.btn{cursor:pointer;border:1px solid transparent;border-radius:11px;padding:11px 16px;font-weight:750;font:inherit;transition:transform .15s,filter .15s}.btn:hover,.field button:hover{filter:brightness(1.08);transform:translateY(-1px)}.primary{background:linear-gradient(105deg,#167de5,#2864f0);color:#fff;box-shadow:0 8px 22px #186fe838}.secondary{background:#101f33;color:#d9e6f8;border-color:#2a405c}.buttonrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}
+.notice{border-radius:13px;background:linear-gradient(120deg,#2b2416,#1d1a16);border:1px solid #5c4826;color:#f1d9a2;padding:14px 16px;font-size:13px;margin-top:15px}.notice strong{display:block;margin-bottom:3px;color:#ffd77e}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:13px}.ticket{border:1px solid #233b59;border-radius:15px;padding:17px;background:linear-gradient(145deg,#0e1c30,#091424);box-shadow:inset 0 1px #ffffff06}.tickethead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:14px}.tickethead strong{font-size:14px;color:#eaf2ff}.balls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.ball{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:850;color:#fff;border:1px solid #ffffff2e;box-shadow:inset 0 2px 4px #ffffff40,inset 0 -4px 8px #0004,0 5px 12px #0004}.b1{background:linear-gradient(145deg,#ffe59a,#d89b22);color:#352300}.b2{background:linear-gradient(145deg,#6db9ff,#1762c7)}.b3{background:linear-gradient(145deg,#ff9393,#c62f43)}.b4{background:linear-gradient(145deg,#c9a6ff,#7442b5)}.b5{background:linear-gradient(145deg,#75e8b3,#16845f)}
+.metrics{font-size:12px;color:#96abc6;line-height:1.9}.tag{display:inline-block;border-radius:999px;background:#102e4d;border:1px solid #224d77;color:#79bdff;padding:4px 9px;font-size:11px;font-weight:800}.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:11px;margin-top:14px}.stat{padding:15px;border:1px solid #203751;border-radius:13px;background:linear-gradient(145deg,#0f2035d9,#081322e6)}.stat .value{font-size:25px;font-weight:850;letter-spacing:-.03em;margin-top:5px;color:#f2f7ff}.bar{height:7px;background:#172b43;border-radius:99px;overflow:hidden;margin-top:9px}.bar span{height:100%;display:block;background:linear-gradient(90deg,#2d9cff,#4d6fff);border-radius:99px}.fine{font-size:12px;color:#91a4bf}.hidden{display:none!important}.status{margin-top:13px;font-size:13px;color:#8dbfff;min-height:1em}footer{font-size:12px;color:#7187a4;padding:12px 4px;border-top:1px solid #182a40;margin-top:22px}button:disabled{opacity:.55;cursor:wait;transform:none}::selection{background:#1b65a8;color:#fff}
+@media(max-width:640px){main{padding:13px 11px 32px}.hero{padding:24px 20px;border-radius:17px}.hero h1{font-size:31px}.hero p{font-size:14px}.card{padding:16px;border-radius:15px}.filters{grid-template-columns:1fr}.filter{padding:13px}.controls{align-items:stretch}.controls .field{flex:1;min-width:calc(50% - 8px)}.field input[type=number]{width:100%;min-width:0}.buttonrow .btn{flex:1 1 100%}.results{grid-template-columns:1fr}.ball{width:37px;height:37px}.statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat .value{font-size:21px}}
+
+
+.top-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 20px;padding:7px;border:1px solid #203751;background:#091525;border-radius:15px;position:sticky;top:8px;z-index:10;backdrop-filter:blur(14px)}
+.nav-tab{border:1px solid transparent;border-radius:10px;background:transparent;color:#9fb2cc;padding:13px 12px;font:inherit;font-weight:800;cursor:pointer;transition:all .18s}
+.nav-tab:hover{background:#10233a;color:#e8f3ff}.nav-tab.active{background:linear-gradient(135deg,#1677c9,#394ee7);color:#fff;box-shadow:0 6px 18px #1456a844}
+.page-panel{display:none}.page-panel.active{display:block;animation:pageIn .22s ease-out}@keyframes pageIn{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:520px){.top-nav{top:4px;gap:6px;padding:5px}.nav-tab{padding:11px 7px;font-size:13px}}
+
+/* ===== BLACK LABEL : visual redesign only ===== */
+:root{
+  color-scheme:dark;
+  --bg:#090909;
+  --card:#111110;
+  --ink:#f5f2eb;
+  --muted:#aaa69c;
+  --line:#302d25;
+  --blue:#c5a45d;
+  --blue2:#211d13;
+  --green:#b6a16c;
+  --greenbg:#201c12;
+  --amber:#d7bd7b;
+  --amberbg:#211c12;
+  --gold:#d6b66e;
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(ellipse at 50% -22%,rgba(214,182,110,.095),transparent 47%),
+    linear-gradient(180deg,#090909 0%,#0d0d0c 48%,#080808 100%);
+  color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.005em;
+}
+main{max-width:1180px;padding:34px 24px 58px}
+.hero{
+  background:linear-gradient(118deg,#141411 0%,#10100e 58%,#17150f 100%);
+  border:1px solid #403824;
+  border-radius:5px;
+  padding:clamp(28px,5vw,54px);
+  margin-bottom:22px;
+  box-shadow:0 22px 65px #0008,inset 0 1px #ffffff08;
+}
+.hero:after{
+  width:360px;height:360px;right:-130px;top:-190px;
+  background:radial-gradient(circle,rgba(214,182,110,.13),transparent 69%);
+}
+.hero h1{
+  font-size:clamp(32px,4.5vw,49px);
+  letter-spacing:-.055em;font-weight:720;
+}
+.hero h1:before{
+  content:"THE LOTTERY STUDIO  /  NUMBER GENERATOR";
+  color:var(--gold);font-size:10px;letter-spacing:.24em;
+  margin-bottom:17px;font-weight:700;
+}
+.hero p{color:#c4c0b5;max-width:700px;line-height:1.85;font-size:14px}
+.card{
+  background:linear-gradient(145deg,#131311,#0e0e0d);
+  border:1px solid #2b2923;border-radius:5px;
+  padding:25px;margin-bottom:18px;
+  box-shadow:0 14px 35px #0003,inset 0 1px #ffffff05;
+}
+h2{
+  font-size:17px;letter-spacing:-.025em;margin-bottom:16px;
+  font-weight:700;gap:11px;
+}
+h2:before{
+  width:2px;height:18px;border-radius:0;
+  background:var(--gold);
+}
+h3{font-size:15px}
+.sub{color:#aaa69c}
+.filters{gap:10px}
+.filter{
+  background:#141412;border:1px solid #302e27;border-radius:4px;
+  padding:16px;transition:border-color .2s,background .2s;
+}
+.filter:hover{border-color:#8d7745;transform:none;background:#171611}
+.filter input[type=checkbox]{accent-color:#c7a65e}
+.filter label{color:#eee9dd;font-weight:650}
+.desc{color:#a49f93;line-height:1.65}
+.controls{gap:11px}
+.field label{color:#b9b2a2;letter-spacing:.025em}
+.field input,.field select{
+  border:1px solid #39362c;border-radius:4px;
+  background:#0b0b0a;color:#f1eee7;padding:11px 12px;
+}
+.field input:focus,.field select:focus{
+  border-color:#b99a56;box-shadow:0 0 0 2px #c7a65e1a;
+}
+.field button,.btn{
+  border-radius:4px;padding:11px 17px;font-weight:650;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+.btn:hover,.field button:hover{filter:none;transform:translateY(-1px)}
+.primary{
+  background:linear-gradient(135deg,#d9bd79,#b8964d);
+  color:#17130a;border-color:#d9bd79;
+  box-shadow:0 5px 18px #b8964d18;
+}
+.primary:hover{background:#e2ca91}
+.secondary{
+  background:#171714;color:#e1dccf;border-color:#39362c;
+}
+.secondary:hover{background:#201e18;border-color:#74613b}
+.buttonrow{gap:9px}
+.notice{
+  border-radius:4px;background:#19160f;border:1px solid #4a3d23;
+  color:#d8c89f;padding:14px 16px;line-height:1.75;
+}
+.notice strong{color:#e0c27a;letter-spacing:.015em}
+.results{gap:12px}
+.ticket{
+  border:1px solid #343126;border-radius:4px;padding:18px;
+  background:linear-gradient(145deg,#171714,#10100f);
+  box-shadow:inset 0 1px #ffffff05;
+}
+.tickethead{margin-bottom:16px}
+.tickethead strong{color:#eee9dd;font-size:13px;letter-spacing:.02em}
+.ball{
+  width:42px;height:42px;border-radius:50%;font-weight:750;
+  border:1px solid #ffffff32;
+  box-shadow:inset 0 1px 2px #ffffff75,inset 0 -4px 7px #0003,0 3px 8px #0004;
+}
+.b1{background:linear-gradient(145deg,#f2dfaa,#c5a04f);color:#2c220d}
+.b2{background:linear-gradient(145deg,#f8f7f2,#c9c6bd);color:#25241f}
+.b3{background:linear-gradient(145deg,#d9d5ca,#8e8a80);color:#24231f}
+.b4{background:linear-gradient(145deg,#e8d7a7,#a88a4d);color:#2b210e}
+.b5{background:linear-gradient(145deg,#b9b5a9,#77746b);color:#171713}
+.tag{
+  background:#211d13;border:1px solid #5a4a2a;color:#d8bc78;
+  padding:4px 9px;font-size:10px;letter-spacing:.025em;
+}
+.metrics{color:#aaa69b;line-height:2}
+.statgrid{gap:10px}
+.stat{
+  padding:16px;border:1px solid #302d25;border-radius:4px;
+  background:linear-gradient(145deg,#171714,#10100f);
+}
+.stat .value{color:#f2eee4;font-size:25px;font-weight:720}
+.bar{height:4px;background:#302d25;border-radius:0}
+.bar span{background:linear-gradient(90deg,#9f8244,#e0c77e);border-radius:0}
+.fine{color:#9d988d;line-height:1.7}
+.status{color:#d7bd7b}
+.top-nav{
+  gap:8px;margin:18px 0 20px;padding:5px;
+  border:1px solid #302d25;background:#10100f;border-radius:4px;
+  box-shadow:0 8px 25px #0003;
+}
+.nav-tab{
+  border-radius:3px;color:#aaa69b;padding:13px 12px;
+  font-weight:650;letter-spacing:.01em;
+}
+.nav-tab:hover{background:#1b1a16;color:#f2eee4}
+.nav-tab.active{
+  background:linear-gradient(135deg,#d7bd7b,#b18e48);
+  color:#18140b;box-shadow:none;
+}
+.page-panel.active{animation:pageIn .2s ease-out}
+footer{
+  color:#777267;border-top:1px solid #29271f;
+  line-height:1.8;margin-top:26px;padding-top:16px;
+}
+button:disabled{opacity:.55}
+::selection{background:#c6a65d;color:#17130a}
+@media(max-width:640px){
+  main{padding:16px 12px 34px}
+  .hero{padding:28px 21px;border-radius:4px}
+  .hero h1{font-size:32px}
+  .card{padding:17px;border-radius:4px}
+  .buttonrow .btn{flex:1 1 100%}
+  .ball{width:37px;height:37px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+/* ===== end BLACK LABEL ===== */
+
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<h1>정태민이 예지하는 로또 번호</h1>
+<p>홀짝·합계·연속번호 등 원하는 조건을 설정해 나만의 번호 조합을 만들어 보세요.</p>
+</section>
+<nav class="top-nav" aria-label="주요 메뉴"><button class="nav-tab active" type="button" data-page="generatePage">랜덤 번호 추천</button><button class="nav-tab" type="button" data-page="historyPage">이전 당첨 번호</button></nav>
+<div id="generatePage" class="page-panel active">
+<section class="card">
+<h2>생성 조건 설정</h2>
+<p class="sub">원하는 조건을 선택하세요. 체크를 해제하면 해당 조건은 적용하지 않습니다.</p>
+<div class="filters">
+ <div class="filter"><input id="fParity" type="checkbox" checked><div><label for="fParity">홀짝 균형</label><div class="desc">홀수 2~4개, 짝수 2~4개 (3:3을 강제하지 않음)</div></div></div>
+ <div class="filter"><input id="fSum" type="checkbox" checked><div><label for="fSum">번호 합계 범위</label><div class="desc">아래 설정한 최솟값~최댓값 안</div><div class="controls" style="margin-top:8px"><div class="field"><label for="sumMin">최솟값</label><input id="sumMin" type="number" min="21" max="255" value="100"></div><div class="field"><label for="sumMax">최댓값</label><input id="sumMax" type="number" min="21" max="255" value="170"></div></div></div></div>
+ <div class="filter"><input id="fAdj" type="checkbox" checked><div><label for="fAdj">연속 인접쌍 수 제한</label><div class="desc">차이가 1인 쌍의 총수. 예: 2·3·4는 인접쌍 2개로 계산</div><div class="field" style="margin-top:8px"><label for="adjMax">허용할 인접쌍 최대</label><select id="adjMax"><option value="0">0쌍</option><option value="1">1쌍</option><option value="2" selected>2쌍</option><option value="3">3쌍</option><option value="4">4쌍</option><option value="5">5쌍</option></select></div></div></div>
+ <div class="filter"><input id="fDecade" type="checkbox" checked><div><label for="fDecade">같은 십의 자리 구간 몰림 제한</label><div class="desc">구간: 1~9, 10~19, 20~29, 30~39, 40~45</div><div class="field" style="margin-top:8px"><label for="decadeMax">한 구간에 허용할 최대 번호</label><select id="decadeMax"><option value="2">2개</option><option value="3" selected>3개</option><option value="4">4개</option><option value="5">5개</option><option value="6">6개</option></select></div></div></div>
+ <div class="filter"><input id="fUnits" type="checkbox" checked><div><label for="fUnits">끝자리 중복쌍 제한</label><div class="desc">같은 일의 자리 숫자끼리의 쌍 수. 예: 22·32·42는 중복쌍 3개</div><div class="field" style="margin-top:8px"><label for="unitMax">허용할 끝자리 중복쌍 최대</label><select id="unitMax"><option value="0">0쌍</option><option value="1">1쌍</option><option value="2" selected>2쌍</option><option value="3">3쌍</option><option value="4">4쌍</option><option value="5">5쌍</option><option value="6">6쌍</option><option value="10">10쌍</option><option value="10">제한 없음(최대 10)</option></select></div></div></div>
+ <div class="filter"><input id="fLowHigh" type="checkbox" checked><div><label for="fLowHigh">저번호·고번호 균형</label><div class="desc">저번호 1~22와 고번호 23~45가 각각 2~4개</div></div></div>
+</div>
+<div class="notice"><strong>확률 해석 주의</strong>필터는 번호 조합의 모양을 조절할 뿐, 당첨 확률을 높이지 않습니다. 아래 계산은 조건을 통과하는 조합의 비율을 보여줍니다.</div>
+<div class="buttonrow"><button class="btn primary" id="generate">랜덤 번호 생성</button><button class="btn secondary" id="calc">필터 통과 조합 비율 계산</button><button class="btn secondary" id="reset">기본값 복원</button></div>
+<div class="controls" style="margin-top:14px"><div class="field"><label for="lineCount">생성할 게임 수</label><select id="lineCount"><option>1</option><option>3</option><option>5</option><option selected>10</option><option>15</option><option>20</option></select></div><div class="field"><label for="unique">중복 조합</label><select id="unique"><option value="yes" selected>한 번 생성한 조합은 중복 제외</option><option value="no">중복 허용</option></select></div></div>
+<div id="status" class="status" aria-live="polite"></div>
+<div id="coverage" class="statgrid"></div>
+</section>
+<section class="card">
+<h2>생성된 조합</h2>
+<div id="results" class="results"><p class="sub">필터를 설정한 뒤 ‘랜덤 번호 생성’을 누르세요.</p></div>
+<div class="buttonrow"><button class="btn secondary" id="copy">결과 복사</button><button class="btn secondary" id="download">텍스트 파일로 저장</button></div>
+</section>
+<section class="card">
+<h2>분석 기준 및 확률 안내</h2>
+<div class="statgrid">
+ <div class="stat"><div class="sub">연속 인접쌍 0~2</div><div class="value">98.74%</div><div class="fine">이 조건만 적용했을 때 통과 비율</div></div>
+ <div class="stat"><div class="sub">한 십의 자리 구간 최대 3개</div><div class="value">93.90%</div><div class="fine">4개 이상 한 구간에 몰리는 경우만 제외</div></div>
+ <div class="stat"><div class="sub">끝자리 중복쌍 최대 2</div><div class="value">90.31%</div><div class="fine">세 번호가 모두 같은 끝자리인 경우 등을 제한</div></div>
+ <div class="stat"><div class="sub">합계 100~170</div><div class="value">75.50%</div><div class="fine">이 조건만 적용했을 때 통과 비율</div></div>
+</div>
+<p class="sub" style="margin-top:14px">각 비율은 전체 가능한 6개 조합을 전수 계산한 이론값입니다. 여러 필터를 함께 적용한 비율은 필터 간 관계 때문에 개별 비율을 단순히 곱하면 안 됩니다. 위 계산 버튼으로 현재 설정의 교집합을 정확히 계산할 수 있습니다.</p>
+<div class="notice"><strong>실제 1등 확률</strong>중복 없이 서로 다른 조합을 10게임 구매하면 1등 확률은 10/8,145,060, 즉 약 1/814,506입니다. 어떤 필터를 쓰더라도 서로 다른 10개 조합이라면 이 확률은 같습니다. 필터의 실제 역할은 선택 취향과 조합 모양을 관리하는 것입니다.</div>
+</section>
+
+</div>
+<div id="historyPage" class="page-panel">
+<section class="card" id="recentDraws">
+<h2>최근 10회차 당첨 번호</h2>
+<p class="sub">운영자가 저장소의 <code>draws.json</code> 파일을 교체하면 이 목록이 갱신됩니다. 최신 회차부터 표시합니다.</p>
+<div class="statgrid" id="drawSummary"></div>
+<div id="recentList" class="results"><p class="sub">당첨 번호 데이터를 불러오는 중…</p></div>
+</section>
+<section class="card" id="historySearch">
+<h2>역대 당첨 번호 검색</h2>
+<p class="sub">회차 번호 또는 당첨 번호(1~45)를 입력해 해당 회차를 찾을 수 있습니다.</p>
+<div class="controls"><div class="field"><label for="historyQuery">검색어</label><input id="historyQuery" type="search" placeholder="예: 1200 또는 7" /></div><button class="btn primary" id="historySearchBtn">검색</button><button class="btn secondary" id="historyClearBtn">전체 보기</button></div>
+<div id="historyResults" class="results" style="margin-top:14px"></div>
+</section>
+<section class="card" id="numberStats">
+<h2>역대 번호 통계</h2>
+<p class="sub">등록된 파일의 모든 회차를 기준으로 계산합니다. 데이터가 비어 있거나 일부 회차만 있으면 통계도 그 범위에 한정됩니다.</p>
+<div class="statgrid" id="historyStats"></div>
+<div id="frequencyChart" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-top:14px"></div>
+</section>
+
+</div>
+<footer>번호 생성과 통계는 참고용이며 당첨을 예측하거나 보장하지 않습니다.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const allTotal=8145060;
+const filterIds=['fParity','fSum','fAdj','fDecade','fUnits','fLowHigh'];
+function config(){return {parity:$('fParity').checked,sum:$('fSum').checked,sumMin:Math.max(21,Math.min(255,Number($('sumMin').value)||100)),sumMax:Math.max(21,Math.min(255,Number($('sumMax').value)||170)),adj:$('fAdj').checked,adjMax:Number($('adjMax').value),decade:$('fDecade').checked,decadeMax:Number($('decadeMax').value),units:$('fUnits').checked,unitMax:Number($('unitMax').value),lowHigh:$('fLowHigh').checked};}
+function group(x){return x<=9?0:x<=19?1:x<=29?2:x<=39?3:4;}
+function metrics(nums){let sum=0,odd=0,low=0,adj=0,run=1,maxRun=1;let grp=[0,0,0,0,0], units=Array(10).fill(0);for(let i=0;i<6;i++){let x=nums[i];sum+=x;odd+=x%2;low+=x<=22?1:0;grp[group(x)]++;units[x%10]++;if(i){if(x===nums[i-1]+1){adj++;run++;maxRun=Math.max(maxRun,run)}else run=1;}}let unitPairs=units.reduce((s,n)=>s+n*(n-1)/2,0);return {sum,odd,even:6-odd,low,high:6-low,adj,maxRun,grp,maxGroup:Math.max(...grp),units,unitPairs};}
+function pass(nums,cfg){let m=metrics(nums);if(cfg.parity&&(m.odd<2||m.odd>4))return false;if(cfg.sum&&(cfg.sumMin>cfg.sumMax||m.sum<cfg.sumMin||m.sum>cfg.sumMax))return false;if(cfg.adj&&m.adj>cfg.adjMax)return false;if(cfg.decade&&m.maxGroup>cfg.decadeMax)return false;if(cfg.units&&m.unitPairs>cfg.unitMax)return false;if(cfg.lowHigh&&(m.low<2||m.low>4))return false;return true;}
+function randInt(n){if(window.crypto&&crypto.getRandomValues){const max=4294967296,lim=Math.floor(max/n)*n;let v;do{const a=new Uint32Array(1);crypto.getRandomValues(a);v=a[0]}while(v>=lim);return v%n;}return Math.floor(Math.random()*n);}
+function randomLine(){let a=[];while(a.length<6){let n=randInt(45)+1;if(!a.includes(n))a.push(n)}return a.sort((x,y)=>x-y);}
+function ballsHTML(nums){return nums.map(n=>`<span class="ball b${n<=10?1:n<=20?2:n<=30?3:n<=40?4:5}">${n}</span>`).join('');}
+function decadeText(m){return m.grp.map((n,i)=>`${['1~9','10~19','20~29','30~39','40~45'][i]}:${n}`).join(' · ')}
+function resultText(line,i){let m=metrics(line);return `${String(i+1).padStart(2,'0')}. ${line.join(', ')} | 합계 ${m.sum} | 홀짝 ${m.odd}:${m.even} | 연속 인접쌍 ${m.adj} | 끝자리 중복쌍 ${m.unitPairs} | 구간 ${m.grp.join('-')} | 저고 ${m.low}:${m.high}`}
+let generated=[];
+function renderResults(){const el=$('results');if(!generated.length){el.innerHTML='<p class="sub">조건에 맞는 번호를 생성해 주세요.</p>';return;}el.innerHTML=generated.map((nums,i)=>{let m=metrics(nums);return `<div class="ticket"><div class="tickethead"><strong>게임 ${i+1}</strong><span class="tag">합계 ${m.sum}</span></div><div class="balls">${ballsHTML(nums)}</div><div class="metrics">홀짝 ${m.odd}:${m.even} · 저고 ${m.low}:${m.high}<br>인접 연속쌍 ${m.adj}개 · 끝자리 중복쌍 ${m.unitPairs}개<br>십의 자리 구간별 개수: ${decadeText(m)}</div></div>`}).join('');}
+$('generate').addEventListener('click',()=>{let cfg=config(),need=Number($('lineCount').value),unique=$('unique').value==='yes';if(cfg.sum&&cfg.sumMin>cfg.sumMax){$('status').textContent='합계 최솟값은 최댓값보다 클 수 없습니다.';return;}let list=[],seen=new Set(),tries=0,maxTries=Math.max(250000,need*50000);while(list.length<need&&tries<maxTries){tries++;let line=randomLine(),key=line.join('-');if(unique&&seen.has(key))continue;if(!pass(line,cfg))continue;seen.add(key);list.push(line);}generated=list;renderResults();$('status').textContent=`${list.length}/${need}게임 생성 · ${tries.toLocaleString()}회 후보 추출 시도`;if(list.length<need)$('status').textContent+=' · 조건이 너무 엄격해 목표 수만큼 만들지 못했습니다. 일부 필터를 끄거나 완화하세요.';});
+$('copy').addEventListener('click',async()=>{if(!generated.length){$('status').textContent='먼저 번호를 생성하세요.';return;}let txt=generated.map((x,i)=>resultText(x,i)).join('\n');try{await navigator.clipboard.writeText(txt);$('status').textContent='결과를 클립보드에 복사했습니다.';}catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();$('status').textContent='결과를 복사했습니다.';}});
+$('download').addEventListener('click',()=>{if(!generated.length){$('status').textContent='먼저 번호를 생성하세요.';return;}let txt=generated.map((x,i)=>resultText(x,i)).join('\n');let b=new Blob(['\ufeff'+txt],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='lotto_numbers.txt';a.click();URL.revokeObjectURL(u);});
+$('reset').addEventListener('click',()=>{['fParity','fSum','fAdj','fDecade','fUnits','fLowHigh'].forEach(id=>$(id).checked=true);$('sumMin').value=100;$('sumMax').value=170;$('adjMax').value=2;$('decadeMax').value=3;$('unitMax').value=2;$('lineCount').value='10';$('unique').value='yes';$('coverage').innerHTML='';$('status').textContent='기본 설정을 복원했습니다.';});
+$('calc').addEventListener('click',async()=>{let cfg=config();if(cfg.sum&&cfg.sumMin>cfg.sumMax){$('status').textContent='합계 최솟값은 최댓값보다 클 수 없습니다.';return;}const btn=$('calc');btn.disabled=true;btn.textContent='전체 조합 계산 중…';$('coverage').innerHTML='';let accepted=0,total=0,start=performance.now();$('status').textContent='8,145,060개 조합을 전수 검사합니다. 잠시 기다려 주세요.';
+// Enumerate each 6-number combination exactly once, yielding between outer loops for responsiveness.
+for(let a=1;a<=40;a++){for(let b=a+1;b<=41;b++){for(let c=b+1;c<=42;c++){for(let d=c+1;d<=43;d++){for(let e=d+1;e<=44;e++){for(let f=e+1;f<=45;f++){total++;if(pass([a,b,c,d,e,f],cfg))accepted++;}}}}}if(a%2===0){$('status').textContent=`전수 검사 중… ${total.toLocaleString()} / ${allTotal.toLocaleString()}`;await new Promise(resolve=>setTimeout(resolve,0));}}
+let pct=accepted/allTotal*100;let seconds=((performance.now()-start)/1000).toFixed(1);$('coverage').innerHTML=`<div class="stat"><div class="sub">통과 조합 수</div><div class="value">${accepted.toLocaleString()}</div><div class="fine">전체 ${allTotal.toLocaleString()}개 중</div></div><div class="stat"><div class="sub">전체 대비 통과 비율</div><div class="value">${pct.toFixed(3)}%</div><div class="bar"><span style="width:${pct}%"></span></div><div class="fine">이론적 조합 커버리지</div></div><div class="stat"><div class="sub">필터로 제외된 조합</div><div class="value">${(allTotal-accepted).toLocaleString()}</div><div class="fine">전체 대비 ${(100-pct).toFixed(3)}%</div></div>`;$('status').textContent=`정확한 전수 계산 완료 · ${seconds}초 소요`;btn.disabled=false;btn.textContent='필터 통과 조합 비율 계산';});
+</script>
+
+<script>
+// Draw history is intentionally file-driven: replace draws.json in the repository to update it.
+let drawHistory = [];
+const drawBall = n => `<span class="ball b${n<=10?1:n<=20?2:n<=30?3:n<=40?4:5}">${n}</span>`;
+function safeDraws(raw){
+ if(!Array.isArray(raw)) throw new Error('draws.json 형식 오류: 최상위 값은 배열이어야 합니다.');
+ const rounds=new Set();
+ return raw.map((d,i)=>{
+  const round=Number(d.round), nums=Array.isArray(d.numbers)?d.numbers.map(Number):[];
+  const bonus=Number(d.bonus);
+  if(!Number.isInteger(round)||round<1) throw new Error(`${i+1}번째 항목: round는 1 이상의 정수여야 합니다.`);
+  if(rounds.has(round)) throw new Error(`${round}회차가 중복 등록되어 있습니다.`); rounds.add(round);
+  if(nums.length!==6||nums.some(n=>!Number.isInteger(n)||n<1||n>45)||new Set(nums).size!==6) throw new Error(`${round}회차: numbers에는 1~45의 서로 다른 번호 6개가 필요합니다.`);
+  if(!Number.isInteger(bonus)||bonus<1||bonus>45||nums.includes(bonus)) throw new Error(`${round}회차: 보너스 번호가 올바르지 않습니다.`);
+  return {round,date:String(d.date||''),numbers:[...nums].sort((a,b)=>a-b),bonus};
+ }).sort((a,b)=>b.round-a.round);
+}
+function drawCard(d){return `<div class="ticket"><div class="tickethead"><strong>${d.round}회차</strong><span class="tag">${escapeHTML(d.date||'날짜 미등록')}</span></div><div class="balls">${d.numbers.map(drawBall).join('')}<span style="align-self:center;color:var(--muted);font-size:12px;margin:0 2px">보너스</span>${drawBall(d.bonus)}</div></div>`;}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderRecent(){const recent=drawHistory.slice(0,10);document.getElementById('drawSummary').innerHTML=`<div class="stat"><div class="sub">등록 회차</div><div class="value">${drawHistory.length.toLocaleString()}회</div></div><div class="stat"><div class="sub">가장 최신 회차</div><div class="value">${recent.length?recent[0].round+'회':'—'}</div></div>`;document.getElementById('recentList').innerHTML=recent.length?recent.map(drawCard).join(''):'<p class="sub">아직 등록된 당첨 번호가 없습니다. 저장소의 draws.json 파일에 데이터를 추가해 주세요.</p>';}
+function searchHistory(){
+ const q=document.getElementById('historyQuery').value.trim();
+ const el=document.getElementById('historyResults');
+ // 검색어가 없으면 과거 회차를 모두 표시하지 않아 화면을 간결하게 유지합니다.
+ if(!q){el.innerHTML='<p class="sub">최근 10회차 외의 당첨 번호는 여기서 회차 번호를 검색하면 확인할 수 있습니다.</p>';return;}
+ const n=Number(q);
+ const hits=Number.isInteger(n)?drawHistory.filter(d=>d.round===n):[];
+ el.innerHTML=hits.length?hits.map(drawCard).join(''):'<p class="sub">해당 회차를 찾을 수 없습니다. 회차 번호를 확인해 주세요.</p>';
+}
+function searchHistoryByDate(){
+ const date=document.getElementById('historyDate').value;
+ const el=document.getElementById('historyResults');
+ if(!date){el.innerHTML='<p class="sub">먼저 추첨 날짜를 선택해 주세요.</p>';return;}
+ const hits=drawHistory.filter(d=>d.date===date);
+ if(hits.length){el.innerHTML=hits.map(drawCard).join('');return;}
+ const hasDates=drawHistory.some(d=>d.date);
+ el.innerHTML=hasDates
+  ? '<p class="sub">선택한 날짜의 회차가 없습니다. 실제 추첨 날짜를 선택했는지 확인해 주세요.</p>'
+  : '<p class="sub">현재 draws.json에는 추첨 날짜가 없습니다. 날짜별 조회를 사용하려면 회차별 date 정보를 추가해야 합니다.</p>';
+}
+function renderStats(){const freq=Array(46).fill(0),bonusFreq=Array(46).fill(0);drawHistory.forEach(d=>{d.numbers.forEach(n=>freq[n]++);bonusFreq[d.bonus]++;});const total=drawHistory.length, entries=freq.slice(1).map((count,i)=>({n:i+1,count}));const max=Math.max(1,...entries.map(x=>x.count));const sorted=[...entries].sort((a,b)=>b.count-a.count||a.n-b.n);const hot=total?sorted.slice(0,5).map(x=>x.n).join(', '):'—';const cold=total?[...entries].sort((a,b)=>a.count-b.count||a.n-b.n).slice(0,5).map(x=>x.n).join(', '):'—';const odd=drawHistory.reduce((s,d)=>s+d.numbers.filter(n=>n%2).length,0);const sum=drawHistory.reduce((s,d)=>s+d.numbers.reduce((a,n)=>a+n,0),0);document.getElementById('historyStats').innerHTML=`<div class="stat"><div class="sub">분석 회차 수</div><div class="value">${total.toLocaleString()}</div></div><div class="stat"><div class="sub">자주 나온 번호 TOP 5</div><div class="value" style="font-size:17px">${hot}</div></div><div class="stat"><div class="sub">적게 나온 번호 TOP 5</div><div class="value" style="font-size:17px">${cold}</div></div><div class="stat"><div class="sub">당첨 번호 평균 합계</div><div class="value">${total?(sum/total).toFixed(1):'—'}</div></div><div class="stat"><div class="sub">홀수 번호 비중</div><div class="value">${total?(odd/(total*6)*100).toFixed(1)+'%':'—'}</div></div>`;document.getElementById('frequencyChart').innerHTML=entries.map(x=>`<div class="stat" style="padding:9px"><div style="display:flex;justify-content:space-between;align-items:center;gap:5px"><strong>${x.n}</strong><span class="sub">${x.count}회</span></div><div class="bar" style="margin-top:8px"><span style="width:${x.count/max*100}%"></span></div></div>`).join('');}
+async function loadDrawHistory(){try{const res=await fetch('./draws.json?v='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('draws.json을 불러오지 못했습니다 (HTTP '+res.status+').');const raw=await res.json();drawHistory=safeDraws(raw);renderRecent();searchHistory();renderStats();}catch(err){const msg=escapeHTML(err.message||'알 수 없는 오류');document.getElementById('recentList').innerHTML=`<p class="sub">당첨 번호 데이터를 불러오지 못했습니다: ${msg}</p>`;document.getElementById('historyResults').innerHTML='<p class="sub">데이터를 확인할 수 없습니다.</p>';document.getElementById('historyStats').innerHTML='<div class="stat">데이터를 불러오지 못했습니다.</div>';}}
+document.getElementById('historySearchBtn').addEventListener('click',searchHistory);
+const historyDateBtn=document.getElementById('historyDateBtn');if(historyDateBtn)historyDateBtn.addEventListener('click',searchHistoryByDate);
+document.getElementById('historyClearBtn').addEventListener('click',()=>{document.getElementById('historyQuery').value='';const historyDate=document.getElementById('historyDate');if(historyDate)historyDate.value='';searchHistory();});
+document.getElementById('historyQuery').addEventListener('keydown',e=>{if(e.key==='Enter')searchHistory();});
+const historyDate=document.getElementById('historyDate');if(historyDate)historyDate.addEventListener('keydown',e=>{if(e.key==='Enter')searchHistoryByDate();});document.querySelectorAll('.nav-tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.page-panel').forEach(panel=>panel.classList.toggle('active',panel.id===btn.dataset.page));window.scrollTo({top:0,behavior:'smooth'});}));
+loadDrawHistory();
+</script>
+
+</body>
+</html>
